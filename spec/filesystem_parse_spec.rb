@@ -6,7 +6,7 @@ RSpec.configure do |config|
   config.mock_framework = :mocha
 end
 
-describe 'Retreive4me' do
+describe 'filesystem_parse' do
   let(:fs_parser) { Filesystem_Parser.new }
   
   it 'get_items should return array of files' do
