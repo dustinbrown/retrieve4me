@@ -8,8 +8,9 @@ class Filesystem_Parser
   def initialize#(config)
     #load config files
     config = MyConfig.new
-    @path = config.attrs[:path]
+    @path = config.attrs[:download_path]
     @item_array = []
+    #set_items
     #code
     # set items_on_disk
   end
@@ -23,7 +24,7 @@ class Filesystem_Parser
     get_items_in_path(@path).each do |item|
       @@items_on_disk << item
     end
-    @@items_on_disk
+    #@@items_on_disk
   end
 
   def get_items_in_path(path)
