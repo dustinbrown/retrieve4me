@@ -2,6 +2,7 @@
 require_relative 'lib/retrieve4me.rb'
 require 'logger'
 require 'trollop'
+require 'json'
 #require 'pp'
 
 log = Logger.new(STDOUT)
@@ -17,6 +18,7 @@ where [options] are:
 EOS
 
   opt :dry, "Issue a dry-run"
+  opt :all, "See all files listed by the rest end point"
   #opt :file, "Extra data filename to read in, with a very long option description like this one",
   #      :type => String
   #opt :volume, "Volume level", :default => 3.0
@@ -25,14 +27,60 @@ end
 #Trollop::die :volume, "must be non-negative" if opts[:volume] < 0
 #Trollop::die :file, "must exist" unless File.exist?(opts[:file]) if opts[:file]
 
-fs_parser = Filesystem_Parser.new
 
-if opts[:dry]
-  fs_parser.set_items
-  puts fs_parser.get_items
+#Use END so we can use methods before they are defined..
+END {
+
+if opts[:dry] && opts[:all]
+  puts get_rest_data_pretty
+elsif opts[:dry]
+  #puts get_rest_data
+  #puts get_rest_data_pretty
+  #puts get_local_data
+  puts find_matches(get_rest_data_pretty, get_local_data)
+  #fs_parser.set_items
+  #puts fs_parser.get_items
   #code
 end
+}
 
+def find_matches(rest_array, local_array)
+  #requires 2 arrays
+  #look for items in a1 that are also in a2.  if there is a match, store it in matches_array
+#  matches_array = a1.select {|item| !a2.grep(item).empty?}
+  matches_array  = []
+  rest_array.each do |element|
+    if local_array.grep(element).empty?
+      matches_array << element
+    end
+  end
+  
+  matches_array
+end
+
+  def get_rest_data
+  rest_client = Rest_Client.new
+  if rest_client.fetch
+    rest_client.response_body
+  end
+end
+
+def get_rest_data_pretty
+  return_array = []
+  
+  JSON.load(get_rest_data).each do |item|
+    return_array << item['name']
+  end
+  
+  return_array
+  
+end
+
+def get_local_data
+  fs_parser = Filesystem_Parser.new
+  fs_parser.set_items
+  fs_parser.get_items
+end
 #log.debug("get_items: #{fs_parser.get_items}")
 #log.debug("set_items: #{fs_parser.set_items}")
 #puts fs_parser.set_items
