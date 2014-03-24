@@ -6,9 +6,10 @@ class MyConfig
 
   def initialize
     @attrs = {
-      :username => '',
-      :password => '',
-      :path     => ''
+      :username       => 'fake_user',
+      :password       => 'fake_pw',
+      :download_path  => '/tmp/changeme',
+      :host_url       => 'http://localhost:1234/changeme'
     }
   end
 
