@@ -10,15 +10,15 @@ class Rest_Client
   attr_accessor :response_body
 
   def initialize(config={})
-    
+
     if config.empty?
       config = MyConfig.new
-    
+
       @host_url = config.attrs[:host_url]
       @username = config.attrs[:username]
       @password = config.attrs[:password]
       @path     = config.attrs[:download_path]
-    else 
+    else
       @host_url = config[:host_url]
       @username = config[:username]
       @password = config[:password]
@@ -32,13 +32,15 @@ class Rest_Client
     request = Net::HTTP::Get.new(uri)
     request.basic_auth @username, @password
 
-  #begin
+  begin
     response = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(request)
     end
-  #rescue Errno::ECONNREFUSED, /Connection refused/
+  rescue Errno::ECONNREFUSED, /Connection refused/
    # raise RuntimeError, "Sinatra app appears offline"
-  #end
+    puts "Error: Cannot connect to #{@host_url}"
+    exit 1
+  end
     if response.code == "200"
       @response_body = response.body 
       #puts response_body
