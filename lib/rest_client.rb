@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 require_relative '../myconfig.rb'
-require 'net/http'
+#require 'net/http'
+require 'net/https'
+require 'uri'
 
 class Rest_Client
 
@@ -27,20 +29,30 @@ class Rest_Client
   end
 
   def fetch
-    uri = URI(@host_url)
+    #uri = URI(@host_url)
+    uri = URI.parse(@host_url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-    request = Net::HTTP::Get.new(uri)
+    request = Net::HTTP::Get.new(uri.request_uri)
+    #request = Net::HTTP::Get.new(uri)
     request.basic_auth @username, @password
 
-  begin
-    response = Net::HTTP.start(uri.hostname, uri.port) do |http|
-      http.request(request)
-    end
-  rescue Errno::ECONNREFUSED, /Connection refused/
-   # raise RuntimeError, "Sinatra app appears offline"
-    puts "Error: Cannot connect to #{@host_url}"
-    exit 1
-  end
+    response = http.request(request)
+    #response.body
+    #response.status
+    #exit
+
+  #begin
+  #  response = Net::HTTP.start(uri.hostname, uri.port) do |myhttp|
+  #    myhttp.request(request)
+  #  end
+  #rescue Errno::ECONNREFUSED, /Connection refused/
+  # # raise RuntimeError, "Sinatra app appears offline"
+  #  puts "Error: Cannot connect to #{@host_url}"
+  #  exit 1
+  #end
     if response.code == "200"
       @response_body = response.body 
       #puts response_body
