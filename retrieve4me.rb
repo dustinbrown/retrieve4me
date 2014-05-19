@@ -5,9 +5,9 @@ require 'trollop'
 require 'json'
 #require 'pp'
 
-log = Logger.new(STDOUT)
-log.level = Logger::DEBUG
-log.datetime_format = "%Y-%m-%d %H:%M:%S"
+@log = Logger.new(STDOUT)
+@log.level = Logger::DEBUG
+@log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
 opts = Trollop::options do
   version "0.5.0"
@@ -37,12 +37,37 @@ elsif opts[:dry]
   #puts get_rest_data
   #puts get_rest_data_pretty
   #puts get_local_data
-  puts find_matches(get_rest_data_pretty, get_local_data)
+ # puts find_matches(get_rest_data_pretty, get_local_data)
+  puts file_to_retrieve(get_rest_data_pretty, get_local_data)
   #fs_parser.set_items
   #puts fs_parser.get_items
   #code
 end
 }
+
+def file_to_retrieve(rest_array, local_array)
+  #requires 2 arrays
+  #Loops through both arrays, checks for string matches for each element
+  #if a match is found, it skips the item.  If a match is not found, it adds it to the matches array
+  match_found = false
+  matches_array  = []
+
+  rest_array.each do |rest_element|
+    local_array.each do |local_element|
+      if File_matcher.calculate_long_match(rest_element, local_element) > 0.75
+        @log.debug("rest element match: #{rest_element}")
+        match_found = true
+      end
+    end
+
+    if match_found == false
+      @log.debug("adding rest element to download array: #{rest_element}")
+      matches_array << rest_element
+    end
+  end
+
+  matches_array
+end
 
 def find_matches(rest_array, local_array)
   #requires 2 arrays
@@ -50,15 +75,15 @@ def find_matches(rest_array, local_array)
 #  matches_array = a1.select {|item| !a2.grep(item).empty?}
   matches_array  = []
   rest_array.each do |element|
-    if local_array.grep(element).empty?
+    if ! local_array.grep(element).empty?
       matches_array << element
     end
   end
-  
+
   matches_array
 end
 
-  def get_rest_data
+def get_rest_data
   rest_client = Rest_Client.new
   if rest_client.fetch
     rest_client.response_body
@@ -67,13 +92,13 @@ end
 
 def get_rest_data_pretty
   return_array = []
-  
+
   JSON.load(get_rest_data).each do |item|
     return_array << item['name']
   end
-  
+
   return_array
-  
+
 end
 
 def get_local_data
