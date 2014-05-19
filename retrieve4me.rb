@@ -49,24 +49,27 @@ def file_to_retrieve(rest_array, local_array)
   #requires 2 arrays
   #Loops through both arrays, checks for string matches for each element
   #if a match is found, it skips the item.  If a match is not found, it adds it to the matches array
-  match_found = false
+  matches_found = []
   matches_array  = []
 
-  rest_array.each do |rest_element|
-    local_array.each do |local_element|
-      if File_matcher.calculate_long_match(rest_element, local_element) > 0.75
+  local_array.each do |local_element|
+	break_out = false
+  	rest_array.each do |rest_element|
+      if File_matcher.calculate_long_match(rest_element, local_element) > 0.90
         @log.debug("rest element match: #{rest_element}")
-        match_found = true
+				matches_found << rest_element
+		#		break_out = true
       end
+		#break if break_out == true	
     end
-
-    if match_found == false
-      @log.debug("adding rest element to download array: #{rest_element}")
-      matches_array << rest_element
-    end
+    #if file_to_do
+    #  @log.debug("adding rest element to download array: #{rest_element}")
+    #  matches_array << rest_element
+    #end
   end
 
-  matches_array
+  #matches_array
+  rest_array - matches_found.uniq!
 end
 
 def find_matches(rest_array, local_array)

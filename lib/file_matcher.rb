@@ -9,7 +9,7 @@ require 'logger'
 module File_matcher
   #intialize logging
   @log = Logger.new(STDOUT)
-  @log.level = Logger::INFO
+  @log.level = Logger::DEBUG
   @log.formatter = proc do |severity, datetime, progname, msg|
       "#{datetime}: #{severity}: #{msg}\n"
   end
@@ -29,7 +29,7 @@ module File_matcher
     #loop through arrays and find word matches
     first_array.each do |first_element|
       second_array.each do |second_element|
-        if first_element =~ /#{second_element}/i
+        if first_element.downcase == second_element.downcase
           @log.debug("string match: #{first_element}:#{second_element}")
           match += 1
         end
