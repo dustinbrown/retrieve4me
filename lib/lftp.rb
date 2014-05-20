@@ -7,11 +7,6 @@
 require 'logger'
 require_relative '../myconfig.rb'
 
-config = MyConfig.new
-
-@ftp_password = config.attrs[:ftp_password]
-@ftp_url 			= config.attrs[:ftp_url]
-@username 		= config.attrs[:username]
 
 module Lftp
   #intialize logging
@@ -21,6 +16,12 @@ module Lftp
       "#{datetime}: #{severity}: #{msg}\n"
   end
   #@log.datetime_format = "%Y-%m-%d %H:%M:%S"
+  
+	config = MyConfig.new
+	
+	@ftp_password = config.attrs[:ftp_password]
+	@ftp_url 			= config.attrs[:ftp_url]
+	@username 		= config.attrs[:username]
 
 	def Lftp.build_file(transfer_list)
 		transfer_file = File.new("/tmp/transfer_file", "w")
