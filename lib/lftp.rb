@@ -49,6 +49,6 @@ cd complete
 
 	end
 end
-my_hash = { :file => ['file1'] }
+#my_hash = { :file => ['file1'] }
 #my_hash = { :dir => ['dir1', 'dir2'], :file => ['file1', 'file2'] }
-Lftp.build_file(my_hash)
+#Lftp.build_file(my_hash)
