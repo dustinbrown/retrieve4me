@@ -6,10 +6,12 @@ class MyConfig
 
   def initialize
     @attrs = {
-      :username       => 'fake_user',
-      :password       => 'fake_pw',
       :download_path  => '/tmp/changeme',
+			:ftp_password   => 'fake_ftp_pw',
+			:ftp_url        => 'sftp://localhost:22',
       :host_url       => 'http://localhost:1234/changeme'
+      :password       => 'fake_pw',
+      :username       => 'fake_user',
     }
   end
 
