@@ -40,7 +40,7 @@ END {
 
 	puts get_rest_data_pretty																		if opts[:list]
 
-	puts find_override(opts[:override], get_rest_data_pretty)		if opts[:override]
+	puts find_override(opts[:override], get_rest_data_pretty)		if opts[:override] && opts[:list]
 
 	if opts[:override] && opts[:pull]
 		override_hash = find_override(opts[:override], get_rest_data_pretty("array_of_hashes"))
