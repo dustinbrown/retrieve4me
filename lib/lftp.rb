@@ -5,6 +5,13 @@
 # CREATED:  2014-05-05 20:40:02
 # MODIFIED: 2014-05-18 19:15:38
 require 'logger'
+require_relative '../myconfig.rb'
+
+config = MyConfig.new
+
+@ftp_password = config.attrs[:ftp_password]
+@ftp_url 			= config.attrs[:ftp_url]
+@username 		= config.attrs[:username]
 
 module Lftp
   #intialize logging
@@ -26,19 +33,17 @@ set ftp:ssl-protect-data true
 set mirror:use-pget-n 4
 set mirror:parallel-transfer-count 2
 set mirror:parallel-directories true
-lftp -u deeje,clownsgameboardblue sftp://deeje.aireservers.com
+lftp -u #{@username},#{@ftp_password} #{@ftp_url}
 cd complete
 			EOS
-		if transfer_list[:dir]
-			transfer_list[:dir].each do |dir|
-				transfer_file.puts "mirror #{dir}"
+		transfer_list.each do |media|
+			if media[:file_type] == "dir"
+				transfer_file.puts "mirror #{media[:file_name]}"
 			#transfer_file.puts "mirror #{transfer_list[:dir]}"
+			elsif media[:file_type] == "file"
+				transfer_file.puts "pget #{media[:file_name]}"	
 			end
  		end
-
-		if transfer_list[:file]
-			transfer_file.puts "pget #{transfer_list[:file].join(' ')}"
-		end
 
 		transfer_file.puts "quit"
 		transfer_file.close
@@ -46,9 +51,7 @@ cd complete
 	end
 
 	def Lftp.execute_transfer
+		system('cd /video/complete && /usr/local/bin/lftp -f /tmp/transfer_file')
 
 	end
 end
-#my_hash = { :file => ['file1'] }
-#my_hash = { :dir => ['dir1', 'dir2'], :file => ['file1', 'file2'] }
-#Lftp.build_file(my_hash)
