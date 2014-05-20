@@ -9,7 +9,7 @@ require 'logger'
 module File_matcher
   #intialize logging
   @log = Logger.new(STDOUT)
-  @log.level = Logger::DEBUG
+  @log.level = Logger::INFO
   @log.formatter = proc do |severity, datetime, progname, msg|
       "#{datetime}: #{severity}: #{msg}\n"
   end
