@@ -21,6 +21,7 @@ EOS
   opt :dry, "Issue a dry-run"
 	opt :list, "list rest files"
 	opt :override, "Enter override file name, can be regex", :type => :string
+	opt :pull, "Initiate lftp pull"
   #opt :file, "Extra data filename to read in, with a very long option description like this one",
   #      :type => String
   #opt :volume, "Volume level", :default => 3.0
@@ -37,9 +38,15 @@ END {
 
 	puts file_to_retrieve(get_rest_data_pretty, get_local_data) if opts[:dry]
 
-	puts get_rest_data_pretty 																	if opts[:list]
+	puts get_rest_data_pretty																		if opts[:list]
 
 	puts find_override(opts[:override], get_rest_data_pretty)		if opts[:override]
+
+	if opts[:override] && opts[:pull]
+		override_hash = find_override(opts[:override], get_rest_data_pretty("array_of_hashes"))
+		Lftp.build_file(override_hash)
+		Lftp.execute_transfer
+	end
 
   #puts get_rest_data
   #puts get_rest_data_pretty
@@ -53,7 +60,18 @@ END {
 }
 
 def find_override(override, rest_array)
-	rest_array.select{|filename| filename.match(/#{override}/)}
+	return_array = []
+	rest_array.each do |media|
+		if media.class == Hash
+			if media[:file_name] =~ /#{override}/
+				return_array << media
+			end
+		#else
+		#	return_array << rest_array.select{|filename| filename.match(/#{override}/)}
+		end
+	end
+	
+	return_array
 end
 
 def file_to_retrieve(rest_array, local_array)
@@ -104,14 +122,21 @@ def get_rest_data
   end
 end
 
-def get_rest_data_pretty
+def get_rest_data_pretty(type="array")
   return_array = []
+	return_array_of_hashes = []
 
   JSON.load(get_rest_data).each do |item|
     return_array << item['name']
+		return_hash = { :file_name => item['name'], :file_type => item['type'] }
+		return_array_of_hashes << return_hash
   end
-
-  return_array
+	
+	#if type == "array"
+  #	return_array
+	#else
+		return_array_of_hashes
+	#end
 
 end
 
